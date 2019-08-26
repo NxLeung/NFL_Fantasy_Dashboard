@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="/css/main.css"> -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <!-- <link rel="stylesheet" type=text/html href="{{ url_for('static', filename='css/main.scss') }}"> -->
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  </head>
+  <header></header>
+
+  <body>
+    <header>
+    </header>
+
+    <section id="sidebar">
+      <nav>
+        <input type="text" name="" value="" </a>
+
+        <a href="#" class="active">Item</a>
+        <li><a href="#">Item</a></li>
+        <li><a href="#">Item</a></li>
+        <li><a href="#">Item</a></li>
+      </nav>
+    </section>
+
+    <section id="dashboard">
+      <div class="heading">
+        <h1>Dashboard</h1>
+      </div>
+
+      <hr>
+
+      <div class="charts">
+        <div class="col-md-9">
+
+          <div class="chart">
+          <div class="player-img"></div>
+          <span class="player-name">{{ dict.player_name[0] }}</span>
+          <span class="player-team">{{ dict.game_year[0] }}</span>
+          <span class="player-position">Defensive tackle</span>
+
+        </div>
+
+        <div class="col-md-9">
+            <h6>Trends Over Time</h6>
+        </div>
+
+      </div>
+    </section>
+    <!-- <script src="{{ url_for('static', filename='js/app.js') }}"></script> -->
+  </body>
+</html>
