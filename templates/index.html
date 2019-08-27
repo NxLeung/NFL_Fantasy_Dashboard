@@ -22,9 +22,9 @@
         <input type="text" name="" value="" </a>
 
         <a href="#" class="active">Item</a>
-        <li><a href="#">Item</a></li>
-        <li><a href="#">Item</a></li>
-        <li><a href="#">Item</a></li>
+        <a href="#">Item</a>
+        <a href="#">Item</a>
+        <a href="#">Item</a>
       </nav>
     </section>
 
@@ -37,18 +37,28 @@
 
       <div class="charts">
         {% for name, value in json.items() %}
-        <div class="col-md-9">
 
           <div class="chart">
           <div class="player-img"></div>
           <span class="player-name">{{name}}</span>
-          <span class="player-team">{{value}}</span>
-          <span class="player-position">Defensive tackle</span>
+          <span class="player-team"></span>
+          <span class="player-position"></span>
 
         </div>
 
-        <div class="col-md-9">
+        <div class="chart">
+            <h6>Player Information</h6>
+            <span class="player-info">{{value}}</span>
+        </div>
+
+        <div class="chart">
             <h6>Trends Over Time</h6>
+            <span class="player-info">{{value}}</span>
+        </div>
+
+        <div class="chart">
+            <h6>Player News</h6>
+            <span class="player-info"></span>
         </div>
         {% endfor %}
       </div>

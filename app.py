@@ -12,49 +12,54 @@ app = Flask(__name__)
 def index():
     # 0. read data from database
     engine = create_engine(f"postgresql://postgres:postgres@localhost/nfl_db")
-    df_player = pd.read_sql("""select * from "Player" where player_name in ('P.Manning') """, engine)
-    # 1. transform every row to json
-    df_player['json'] = df_player.apply(lambda x: x.to_json(), axis=1)
-    # 2. combine each json as a list
-    player_info_list = list(df_player['json'].unique())
-    # 3. create a dict to store each json by name
-    player_info_json = {}
-    for play_info in player_info_list:
-        play_info = dict(json.loads(play_info))
-        if player_info_json.get(play_info['player_name']) == None:
-            key = play_info['player_name']
-            value = json.dumps(play_info)
-            player_info_json[key] = value
-        else:
-            key = play_info['player_name']
-            player_info_json[key] = player_info_json[key] + ',' + json.dumps(play_info)
-    player_info_json
+    df_player = pd.read_sql("""select * from "Player" where player_name = 'P.Manning' """, engine)
 
-    return render_template("index.html", json=dict(player_info_json))
+    df_player.fillna(0, inplace=True)
+    df_player_year = df_player.groupby(["game_year"]).sum()
+    df_player_year = df_player_year.reset_index()
+
+    player_info = {}
+    player_name = list(df_player.player_name.unique())[0]
+    player_info[player_name] = {}
+
+    year_list = sorted(list(df_player_year.game_year.unique()))
+    for year in year_list:
+        df_info = df_player[df_player.game_year == year][['passing_yards_gained', 'receiving_yards_gained', 'rushing_yards_gained']]
+        df_info['json'] = df_info.apply(lambda x: x.to_json(), axis=1)
+
+        player_info[player_name][year] = ','.join(df_info['json'].unique())
+
+    player_info
+
+
+    return render_template("index.html", json=dict(player_info))
+
 @app.route("/player_data", methods=['GET'])
 def pass_data():
     if 'player_name' in request.args:
-        play_name = request.args['player_name']
+        player_name = request.args['player_name']
     else:
-        play_name = 'P.Manning'
+        player_name = 'P.Manning'
     engine = create_engine(f"postgresql://postgres:postgres@localhost/nfl_db")
-    df_player = pd.read_sql(f"""select * from "Player" where player_name = '{play_name}' """, engine)
-    # 1. transform every row to json
-    df_player['json'] = df_player.apply(lambda x: x.to_json(), axis=1)
-    # 2. combine each json as a list
-    player_info_list = list(df_player['json'].unique())
-    # 3. create a dict to store each json by name
-    player_info_json = {}
-    for play_info in player_info_list:
-        play_info = dict(json.loads(play_info))
-        if player_info_json.get(play_info['player_name']) == None:
-            key = play_info['player_name']
-            value = json.dumps(play_info)
-            player_info_json[key] = value
-        else:
-            key = play_info['player_name']
-            player_info_json[key] = player_info_json[key] + ',' + json.dumps(play_info)
-    return json.dumps(player_info_json)
+    df_player = pd.read_sql(f"""select * from "Player" where player_name = '{player_name}' """, engine)
+
+    df_player.fillna(0, inplace=True)
+    df_player_year = df_player.groupby(["game_year"]).sum()
+    df_player_year = df_player_year.reset_index()
+
+    player_info = {}
+    player_name = list(df_player.player_name.unique())[0]
+    player_info[player_name] = {}
+
+    year_list = sorted(list(df_player_year.game_year.unique()))
+
+    for year in year_list:
+        df_info = df_player[df_player.game_year == year][['passing_yards_gained', 'receiving_yards_gained', 'rushing_yards_gained']]
+        df_info['json'] = df_info.apply(lambda x: x.to_json(), axis=1)
+
+        player_info[player_name][year] = ','.join(df_info['json'].unique())
+
+    return json.dumps(player_info)
 
 if __name__ == "__main__":
     app.run(debug=True)
