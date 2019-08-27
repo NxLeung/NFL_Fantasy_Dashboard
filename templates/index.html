@@ -36,12 +36,13 @@
       <hr>
 
       <div class="charts">
+        {% for name, value in json.items() %}
         <div class="col-md-9">
 
           <div class="chart">
           <div class="player-img"></div>
-          <span class="player-name">{{ dict.player_name[0] }}</span>
-          <span class="player-team">{{ dict.game_year[0] }}</span>
+          <span class="player-name">{{name}}</span>
+          <span class="player-team">{{value}}</span>
           <span class="player-position">Defensive tackle</span>
 
         </div>
@@ -49,7 +50,7 @@
         <div class="col-md-9">
             <h6>Trends Over Time</h6>
         </div>
-
+        {% endfor %}
       </div>
     </section>
     <!-- <script src="{{ url_for('static', filename='js/app.js') }}"></script> -->
