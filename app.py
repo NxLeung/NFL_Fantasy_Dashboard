@@ -16,7 +16,7 @@ api = NewsApiClient(api_key=api_key)
 @app.route("/")
 def index():
     # 0. read data from database
-    engine = create_engine(f"postgresql://postgres:postgres@localhost/nfl")
+    engine = create_engine(f"postgresql://postgres:postgres@localhost/NFL")
     df_player = pd.read_sql("""select * from "Player" where player_name = 'P.Manning' """, engine)
 
     df_player.fillna(0, inplace=True)
@@ -45,15 +45,15 @@ def index():
 
     return render_template("index.html", json=dict(player_info), articles=top_articles)
 
-@app.route("/player_data", methods=['GET'])
-def pass_data():
+@app.route("/<player_name>", methods=['GET'])
+def pass_data(player_name):
     # STEP 1: API Receive play_name as a value, default is 'P,Manning'
-    if 'player_name' in request.args:
-        player_name = request.args['player_name']
-    else:
-        player_name = 'P.Manning'
+    # if 'player_name' in request.args:
+    #     player_name = request.args['player_name']
+    # else:
+    #     player_name = 'P.Manning'
     # STEP 2: Query Player Data from DB, based on the api received value    
-    engine = create_engine(f"postgresql://postgres:postgres@localhost/nfl")
+    engine = create_engine(f"postgresql://postgres:postgres@localhost/NFL")
     df_player = pd.read_sql(f"""select * from "Player" where player_name = '{player_name}' """, engine)
     # STEP 2.2: if nothing return, return 
     if len(df_player) == 0:
