@@ -1,11 +1,16 @@
 # import necessary libraries
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
+from newsapi import NewsApiClient
+from config import api_key
 import pandas as pd
 from sqlalchemy import create_engine
 import json
 # create instance of Flask app
 app = Flask(__name__)
+
+# Initialize news client
+api = NewsApiClient(api_key=api_key)
 
 # create route that renders index.html template
 @app.route("/")
@@ -32,8 +37,13 @@ def index():
         player_info[player_name][year] = list(df_info['json'].unique())[0]
     player_info
 
+    # Construct a search query like `football firstInitial lastName` and retrieve top 5 articles
+    player_name_separated = ' '.join(player_name.split('.'))
+    query = 'football ' + player_name_separated
+    api_result = api.get_everything(q=query,sort_by='popularity',domains='bleacherreport.com,espn.com')
+    top_articles=api_result['articles'][:5]
 
-    return render_template("index.html", json=dict(player_info))
+    return render_template("index.html", json=dict(player_info), articles=top_articles)
 
 @app.route("/player_data", methods=['GET'])
 def pass_data():

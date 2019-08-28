@@ -20,7 +20,6 @@
     <section id="sidebar">
       <nav>
         <input type="text" name="" value="" </a>
-
         <a href="#" class="active">Item</a>
         <a href="#">Item</a>
         <a href="#">Item</a>
@@ -47,18 +46,48 @@
         </div>
 
         <div class="chart">
-            <h6>Player Information</h6>
-            <span class="player-info">{{value}}</span>
+            <h3>Player Information</h3>
+            <span class="player-info">
+              <!-- {{value}} -->
+            </span>
         </div>
 
         <div class="chart">
-            <h6>Trends Over Time</h6>
-            <span class="player-info">{{value}}</span>
+            <h3>Trends Over Time</h3>
+            <span class="player-info">
+              <!-- {{value}} -->
+            </span>
         </div>
 
+        <!-- Displays a list of the the provided news articles, or a message saying none were found. -->
         <div class="chart">
-            <h6>Player News</h6>
-            <span class="player-info"></span>
+          <h3>Player News</h3>
+          <span class="player-info">
+            <ul>
+              {% for article in articles %}
+                <li>
+                  <div class="news_article">
+                    <div class="news_top_row">
+                      <!-- <img class="news_image" src="{{article["urlToImage"]}}"> -->
+                      <!-- Article name with link -->
+                      <a href="{{article["url"]}}">
+                        <span class="news_title">{{article["title"]}}</span>
+                      </a>
+                    </div>
+                  {%if article["author"] is not none %}
+                    <div class="news_author">{{article["author"]}}</div>
+                  {% endif %}
+                  <!-- Excerpt from article (styled via API). -->
+                  <div class="news_description">{{article["description"]|safe}}</div>
+                </div>
+                </li>
+              {% else %}
+                <span class="news_missing">
+                  No relevant news articles found for player.
+                </span>
+              {% endfor %}
+            </ul>
+          </span>
         </div>
         {% endfor %}
       </div>
