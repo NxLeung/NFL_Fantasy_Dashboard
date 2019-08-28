@@ -26,31 +26,39 @@ let chartGroup = svg.append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 // Load data from playertable.csv
-d3.json('http://127.0.0.1:5000/player_data?player_name=I.Smith', function(error,playerData) {
+d3.json('http://127.0.0.1:5000/player_data?player_name=T.Brady', function(error,playerData) {
 
   // Throw an error if one occurs
   if (error) throw error;
 
   // Print the playerData
-  console.log(playerData);
-
-  // Configure a parseTime function which will return a new game_year object from a string
-  let parseTime = d3.timeParse("%Y");
+  console.log(playerData["T.Brady"]);
+ 
+  // playerData = JSON.parse(playerData);
+  game_year = playerData["T.Brady"]["game_year"];
   
-  // Format the game_year and cast the  value to a number
-  playerData.forEach(function(d) {
-    d.game_year = parseTime(d.game_year);
-    d.passing_yards_gained= +d.passing_yards_gained;
-    d.receiving_yards_gained= +d.receiving_yards_gained;
-    d.rushing_yards_gained= +d.rushing_yards_gained;
-  });
+  console.log(game_year)
+  // passing_yards_gained = JSON.parse(playerData["T.Brady"]["passing_yards_gained"]);
+  // receiving_yards_gained = JSON.parse(playerData["T.Brady"]["receiving_yards_gained"]);
+  // rushing_yards_gained = JSON.parse(playerData["T.Brady"]["rushing_yards_gained"]);
+
+  // //Configure a parseTime function which will return a new game_year object from a string
+  // let parseTime = d3.timeParse("%Y");
+  
+  // // Format the game_year and cast the  value to a number
+  // playerData.forEach(function(d) {
+  //   d.game_year = parseTime(d.game_year);
+  //   d.passing_yards_gained= +d.passing_yards_gained;
+  //   d.receiving_yards_gained= +d.receiving_yards_gained;
+  //   d.rushing_yards_gained= +d.rushing_yards_gained;
+  // });
 
   // Configure a time scale with a range between 0 and the chartWidth
   // Set the domain for the xTimeScale function
   // d3.extent returns the an array containing the min and max values for the property specified
-  let xTimeScale = d3.scaleTime()
+  let xTimeScale = d3.scaleLinear()
     .range([0, chartWidth])
-    .domain(d3.extent(playerData, data => data.game_year));
+    .domain(2009,2018);
 
   // Configure a linear scale with a range between the chartHeight and 0
   // Set the domain for the xLinearScale function
@@ -128,17 +136,17 @@ d3.json('http://127.0.0.1:5000/player_data?player_name=I.Smith', function(error,
    .classed("yards text", true)
    .text("Number of Yards");
 
-// append circles (passing)
-var circlesGroup = chartGroup.selectAll("circle")
-.data(playerData)
-.enter()
-.append("circle")
-.attr("cx", d => xTimeScale(d.game_year))
-.attr("cy", d => yLinearScale1(d.passing_yards_gained))
-.attr("r", "5")
-.attr("fill", "green")
-.attr("stroke-width", "1")
-.attr("stroke", "black");
+// // append circles (passing)
+// var circlesGroup = chartGroup.selectAll("circle")
+// .data(playerData)
+// .enter()
+// .append("circle")
+// .attr("cx", d => xTimeScale(d.game_year))
+// .attr("cy", d => yLinearScale1(d.passing_yards_gained))
+// .attr("r", "5")
+// .attr("fill", "green")
+// .attr("stroke-width", "1")
+// .attr("stroke", "black");
 
 //   // Step 1: Append tooltip div
 //   var toolTip = d3.select("body")
@@ -159,17 +167,17 @@ var circlesGroup = chartGroup.selectAll("circle")
 //     toolTip.style("display", "none");
 //   });
 
-// append circle (receiving)
-var circlesGroup2 = chartGroup.selectAll("circle")
-.data(playerData)
-.enter()
-.append("circle")
-.attr("width", d => xTimeScale(d.game_year))
-.attr("height", d => yLinearScale2(d.receiving_yards_gained))
-.attr("r", "5")
-.attr("fill", "orange")
-.attr("stroke-width", "1")
-.attr("stroke", "black");
+// // append circle (receiving)
+// var circlesGroup2 = chartGroup.selectAll("circle")
+// .data(playerData)
+// .enter()
+// .append("circle")
+// .attr("width", d => xTimeScale(d.game_year))
+// .attr("height", d => yLinearScale2(d.receiving_yards_gained))
+// .attr("r", "5")
+// .attr("fill", "orange")
+// .attr("stroke-width", "1")
+// .attr("stroke", "black");
 
 //   // Step 1: Append tooltip div
 //   var toolTip = d3.select("body")
@@ -221,4 +229,4 @@ var circlesGroup2 = chartGroup.selectAll("circle")
 //     toolTip.style("display", "none");
 //   });
 
-});
+ });
