@@ -16,7 +16,7 @@ def index():
     df_player = pd.read_sql("""select * from "Player" where player_name = 'P.Manning' """, engine)
 
     df_player.fillna(0, inplace=True)
-    df_player = df_player.astype({"game_year": float})
+    df_player = df_player.astype({"game_year": int})
     df_player_year = df_player.drop(columns=['play_type'])
     df_player_year = df_player_year.groupby(["player_id","player_name","game_year"]).sum()
     df_player_year = df_player_year.reset_index()
@@ -52,7 +52,7 @@ def line_chart():
     # # STEP 3: Transform Data
     # # STEP 3.1: clean data & group by 
     # df_player.fillna(0, inplace=True)
-    # df_player = df_player.astype({"game_year": float})
+    # df_player = df_player.astype({"game_year": int})
     # df_player_year = df_player.drop(columns=['play_type'])
     # df_player_year = df_player_year.groupby(["player_id","player_name","game_year"]).sum()
     # df_player_year = df_player_year.reset_index()
@@ -106,7 +106,7 @@ def pass_data():
     # STEP 3: Transform Data
     # STEP 3.1: clean data & group by 
     df_player.fillna(0, inplace=True)
-    df_player = df_player.astype({"game_year": float})
+    df_player = df_player.astype({"game_year": int})
     df_player_year = df_player.drop(columns=['play_type'])
     df_player_year = df_player_year.groupby(["player_id","player_name","game_year"]).sum()
     df_player_year = df_player_year.reset_index()
@@ -116,36 +116,35 @@ def pass_data():
     player_info[player_name] = {}
 
     year_list = sorted(list(df_player_year.game_year.unique()))
-    result = []
+    # result = []
     # STEP 3.3: extract data by year
-    for year in year_list:
-        # 3.3.1. select by year
-        df_info = df_player_year[df_player_year.game_year == year][['passing_yards_gained', 'receiving_yards_gained', 'rushing_yards_gained']]
-        # 3.3.2. transfrom each to dict
-        df_info['json'] = df_info.apply(lambda x: x.to_dict(), axis=1)
-        # 3.3.3. create key, value pair dictionary
-        cur_data = {**{'game_year': year},**list(df_info['json'])[0]}
-        # prev_data = copy.deepcopy(player_info[player_name])
-        # print(cur_data, player_info[player_name])
-        result.append(cur_data)
+    # for year in year_list:
+    #     # 3.3.1. select by year
+    #     df_info = df_player_year[df_player_year.game_year == year][['passing_yards_gained', 'receiving_yards_gained', 'rushing_yards_gained']]
+    #     # 3.3.2. transfrom each to dict
+    #     df_info['json'] = df_info.apply(lambda x: x.to_dict(), axis=1)
+    #     # 3.3.3. create key, value pair dictionary
+    #     cur_data = {**list(df_info['json'])[0], **{'game_year': year}}
+    #     # prev_data = copy.deepcopy(player_info[player_name])
+    #     # print(cur_data, player_info[player_name])
+    #     result.append(cur_data)
 
-    player_info[player_name] = result
+    # player_info[player_name] = result
+    year_list = list(df_player_year.game_year)
+    passing = list(df_player_year.passing_yards_gained)
+    receiving = list(df_player_year.receiving_yards_gained)
+    rushing = list(df_player_year.rushing_yards_gained)
 
+    player_info[player_name] = {'game_year': year_list,
+                                'passing_yards_gained': passing,
+                                'receiving_yards_gained': receiving,
+                                'rushing_yards_gained': rushing}
     print(player_info[player_name])
+    # print(player_info[player_name])
     
     # STEP 4. Turn dictionary to json for frontend to use
     data = json.dumps(player_info)
     return data
-
-    # player_info[player_name] = {'game_year': year_list,
-    #                             'passing_yards_gained': passing,
-    #                             'receiving_yards_gained': receiving,
-    #                             'rushing_yards_gained': rushing}
-    # print(player_info[player_name])
-    
-    # # STEP 4. Turn dictionary to json for frontend to use
-    # data = json.dumps(player_info)
-    # return data
 
 if __name__ == "__main__":
     app.run(debug=True)

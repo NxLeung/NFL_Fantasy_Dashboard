@@ -34,10 +34,8 @@ d3.json('http://127.0.0.1:5000/player_data?player_name=T.Brady', function(error,
   // Print the playerData
   console.log(playerData["T.Brady"]);
  
-  // playerData = JSON.parse(playerData);
-  game_year = playerData["T.Brady"]["game_year"];
+  console.log(playerData["T.Brady"]["game_year"]);
   
-  console.log(game_year)
   // passing_yards_gained = JSON.parse(playerData["T.Brady"]["passing_yards_gained"]);
   // receiving_yards_gained = JSON.parse(playerData["T.Brady"]["receiving_yards_gained"]);
   // rushing_yards_gained = JSON.parse(playerData["T.Brady"]["rushing_yards_gained"]);
@@ -45,7 +43,7 @@ d3.json('http://127.0.0.1:5000/player_data?player_name=T.Brady', function(error,
   // //Configure a parseTime function which will return a new game_year object from a string
   // let parseTime = d3.timeParse("%Y");
   
-  // // Format the game_year and cast the  value to a number
+  // // Format the game_year and cast the value to a number
   // playerData.forEach(function(d) {
   //   d.game_year = parseTime(d.game_year);
   //   d.passing_yards_gained= +d.passing_yards_gained;
@@ -56,7 +54,7 @@ d3.json('http://127.0.0.1:5000/player_data?player_name=T.Brady', function(error,
   // Configure a time scale with a range between 0 and the chartWidth
   // Set the domain for the xTimeScale function
   // d3.extent returns the an array containing the min and max values for the property specified
-  let xTimeScale = d3.scaleLinear()
+  let xTimeScale = d3.scaleTime()
     .range([0, chartWidth])
     .domain(2009,2018);
 
