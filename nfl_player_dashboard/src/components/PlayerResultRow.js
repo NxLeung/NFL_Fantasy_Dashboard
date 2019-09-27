@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import "../playerResultRow.css";
-import { Select } from "react-select";
+// import { Select } from "react-select";
 
 export default class PlayerResultRow extends PureComponent {
   static propTypes = {

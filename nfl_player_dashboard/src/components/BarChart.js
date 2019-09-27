@@ -1,147 +1,114 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
+import chroma from "chroma-js";
+
+const width = 650;
+const height = 400;
+const margin = { top: 20, right: 5, bottom: 20, left: 35 };
+const red = "#eb6a5b";
+const green = "#b6e86f";
+const blue = "#52b6ca";
+const colors = chroma.scale([blue, green, red]).mode("hsl");
 
 class BarChart extends Component {
-  componentDidMount() {
-    this.drawChart();
+  state = {
+    bars: [], // array of rects
+    // d3 helpers
+    // xTimeScale: d3
+    //   .scaleTime()
+    //   .domain(d3.extent(data, d => d.year))
+    //   .range([0, width]),
+
+    // yLinearScale1: d3
+    //   .scaleLinear()
+    //   .domain([0, d3.max(data, d => d.passing_yards_gained)])
+    //   .range([height, 0]),
+
+    // yLinearScale2: d3
+    //   .scaleLinear()
+    //   // .domain([0, d3.max(playerData, d => d.receiving_yards_gained)])
+    //   .domain([
+    //     d3.min(data, data => data.receiving_yards_gained),
+    //     d3.max(data, data => data.rushing_yards_gained)
+    //   ])
+    //   .range([height, 0])
+    passing_yards_gained: null, // svg path command for all the pass temps
+    rushing_yards_gained: null, // svg path command for rush temps,
+    receiving_yards_gained: null,
+
+    xScale: d3.scaleTime().range([margin.left, width - margin.right]),
+    yScale: d3.scaleLinear().range([height - margin.bottom, margin.top]),
+    colorScale: d3.scaleLinear()
+  };
+
+  // bottomAxis = d3.axisBottom(xTimeScale).tickFormat(d3.timeFormat("%Y"));
+  // leftAxis = d3.axisLeft(yLinearScale1);
+  // rightAxis = d3.axisRight(yLinearScale2);
+
+  xAxis = d3
+    .axisBottom()
+    .scale(this.state.xScale)
+    .tickFormat(d3.timeFormat("%Y"));
+  yAxis = d3
+    .axisLeft()
+    .scale(this.state.yScale)
+    .tickFormat(d => `${d} yds`);
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (!nextProps.data) return null; // data hasn't been loaded yet so do nothing
+    const { data } = nextProps;
+    const { xScale, yScale, colorScale } = prevState;
+
+    // data has changed, so recalculate scale domains
+    const timeDomain = d3.extent(data, d => d.year);
+    const yardMax = d3.max(data, d => d.pass);
+    const colorDomain = d3.extent(data, d => d.pass);
+    xScale.domain(timeDomain);
+    yScale.domain([0, yardMax]);
+    colorScale.domain(colorDomain);
+
+    // calculate x and y for each rectangle
+    // const bars = data.map(d => {
+    //   const y1 = yScale(d.high);
+    //   const y2 = yScale(d.low);
+    //   return {
+    //     x: xScale(d.date),
+    //     y: y1,
+    //     height: y2 - y1,
+    //     fill: colors(colorScale(d.avg))
+    //   };
+    // });
+
+    return { bars };
   }
-  drawChart() {
-    var svgWidth = 900;
-    var svgHeight = 600;
 
-    var margin = {
-      top: 20,
-      right: 40,
-      bottom: 60,
-      left: 50
-    };
-
-    var width = svgWidth - margin.left - margin.right;
-    var height = svgHeight - margin.top - margin.bottom;
-
-    var svg = d3
-      .select("#chartbox")
-      .append("svg")
-      .attr("width", svgWidth)
-      .attr("height", svgHeight);
-
-    var chartGroup = svg
-      .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
-    var parseTime = d3.timeParse("%d-%b");
-
-    let donutData = [
-      { date: "30-Apr", morning: 80, evening: 70 },
-      { date: "27-Apr", morning: 85, evening: 60 },
-      { date: "26-Apr", morning: 99, evening: 50 },
-      { date: "25-Apr", morning: 99, evening: 90 },
-      { date: "24-Apr", morning: 85, evening: 60 },
-      { date: "23-Apr", morning: 99, evening: 50 },
-      { date: "20-Apr", morning: 99, evening: 90 },
-      { date: "19-Apr", morning: 79, evening: 85 }
-    ];
-
-    // Format the data
-    donutData.forEach(function(data) {
-      data.date = parseTime(data.date);
-      data.morning = +data.morning;
-      data.evening = +data.evening;
-    });
-
-    // Step 5: Create Scales
-    //= ============================================
-    var xTimeScale = d3
-      .scaleTime()
-      .domain(d3.extent(donutData, d => d.date))
-      .range([0, width]);
-
-    var yLinearScale1 = d3
-      .scaleLinear()
-      .domain([0, d3.max(donutData, d => d.morning)])
-      .range([height, 0]);
-
-    var yLinearScale2 = d3
-      .scaleLinear()
-      .domain([0, d3.max(donutData, d => d.evening)])
-      .range([height, 0]);
-
-    // Step 6: Create Axes
-    // =============================================
-    var bottomAxis = d3
-      .axisBottom(xTimeScale)
-      .tickFormat(d3.timeFormat("%d-%b"));
-    var leftAxis = d3.axisLeft(yLinearScale1);
-    var rightAxis = d3.axisRight(yLinearScale2);
-
-    // Step 7: Append the axes to the chartGroup - ADD STYLING
-    // ==============================================
-    // Add bottomAxis
-    chartGroup
-      .append("g")
-      .attr("transform", `translate(0, ${height})`)
-      .call(bottomAxis);
-
-    // CHANGE THE TEXT TO THE CORRECT COLOR
-    chartGroup
-      .append("g")
-      .attr("stroke", "green") // NEW!
-      .call(leftAxis);
-
-    // CHANGE THE TEXT TO THE CORRECT COLOR
-    chartGroup
-      .append("g")
-      .attr("transform", `translate(${width}, 0)`)
-      .attr("stroke", "orange") // NEW!
-      .call(rightAxis);
-
-    // Step 8: Set up two line generators and append two SVG paths
-    // ==============================================
-    // Line generators for each line
-    var line1 = d3
-      .line()
-      .x(d => xTimeScale(d.date))
-      .y(d => yLinearScale1(d.morning));
-
-    var line2 = d3
-      .line()
-      .x(d => xTimeScale(d.date))
-      .y(d => yLinearScale2(d.evening));
-
-    // Append a path for line1
-    chartGroup
-      .append("path")
-      .data([donutData])
-      .attr("d", line1)
-      .classed("line green", true);
-
-    // Append a path for line2
-    chartGroup
-      .append("path")
-      .data([donutData])
-      .attr("d", line2)
-      .classed("line orange", true);
-
-    chartGroup
-      .append("text")
-      .attr("transform", `translate(${width / 2}, ${height + margin.top + 20})`)
-      .attr("text-anchor", "middle")
-      .attr("font-size", "16px")
-      .attr("fill", "green")
-      .text("Example Charts Craving Level");
-
-    chartGroup
-      .append("text")
-      .attr("transform", `translate(${width / 2}, ${height + margin.top + 37})`)
-      .attr("text-anchor", "middle")
-      .attr("font-size", "16px")
-      .attr("fill", "orange")
-      .text("Evening Donut Craving Level");
+  componentDidUpdate() {
+    d3.select(this.refs.xAxis).call(this.xAxis);
+    d3.select(this.refs.yAxis).call(this.yAxis);
   }
-  // }
 
   render() {
-    return <div id="chart"></div>;
+    return (
+      <svg width={width} height={height}>
+        {this.state.bars.map((d, i) => (
+          <rect
+            key={i}
+            x={d.x}
+            y={d.y}
+            width="2"
+            height={d.height}
+            fill={d.fill}
+          />
+        ))}
+        <g>
+          <g
+            ref="xAxis"
+            transform={`translate(0, ${height - margin.bottom})`}
+          />
+          <g ref="yAxis" transform={`translate(${margin.left}, 0)`} />
+        </g>
+      </svg>
+    );
   }
 }
 
