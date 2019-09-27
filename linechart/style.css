@@ -1,0 +1,29 @@
+.line {
+  fill: none;
+  stroke-width: 2px;
+}
+
+.green {
+  stroke: green;
+}
+
+.blue {
+  stroke: blue;
+}
+
+.orange {
+  stroke: orange;
+}
+
+.text {
+  font-size: 16px;
+  text-anchor: middle;
+}
+
+.smurf-text {
+  fill: blue;
+}
+
+.yards {
+  fill: green;
+}
